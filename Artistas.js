@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
-import { Platform, StyleSheet, Text, View, FlatList, TouchableHighlight } from 'react-native';
+import { Platform, StyleSheet, Text, View, FlatList, TouchableHighlight, ActivityIndicator } from 'react-native';
+import base64 from 'react-native-base64'
+import { API_URL, API_USER, API_PASSWORD } from './Config.js';
 
 export default class ArtistasScreen extends Component {
 
@@ -7,6 +9,7 @@ export default class ArtistasScreen extends Component {
     super(props);
 
     this.state = {
+      isLoading: true,
       artistas: [
         { id: 5, name: 'The Beatles' },
         { id: 59, name: 'The Kinks' }
@@ -14,13 +17,38 @@ export default class ArtistasScreen extends Component {
     }
   }
 
+  componentDidMount(){
+    var headers = new Headers();
+    headers.append('Accept-Encoding', 'gzip');
+    headers.append('Authorization', 'Basic ' + base64.encode(API_USER + ":" + API_PASSWORD));
+
+    return fetch(API_URL + 'artists', { headers: headers })
+        .then((response) => response.json())
+        .then((responseJson) => {
+	    this.setState({
+	        isLoading: false,
+		artistas: responseJson,
+	    }, function(){});
+    })
+    .catch((error) => {
+	console.error(error);
+    });
+  }
+      
   irACanciones(idArtista) {
     return this.props.navigation.navigate('Canciones', { idArtista: idArtista });
   }
 
   render() {
-    return (
-      <View style={styles.container}>
+    if(this.state.isLoading){
+      return(
+        <View style={{flex: 1, padding: 20}}>
+          <ActivityIndicator/>
+        </View>
+      )
+    }
+
+	return (
         <FlatList
           data={this.state.artistas}
           renderItem={({item}) =>
@@ -29,7 +57,6 @@ export default class ArtistasScreen extends Component {
               </TouchableHighlight>
             }
         />
-      </View>
     );
   }
 }
