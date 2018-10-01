@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import { Platform, StyleSheet, Text, View, FlatList, TouchableHighlight, ActivityIndicator } from 'react-native';
 import base64 from 'react-native-base64'
-import { API_URL, API_USER, API_PASSWORD } from './Config.js';
+import { API_URL, API_USER, API_PASSWORD, OFFLINE } from './Config.js';
 
 export default class ArtistasScreen extends Component {
 
@@ -17,7 +17,12 @@ export default class ArtistasScreen extends Component {
     }
   }
 
-  componentDidMount(){
+  componentDidMount() {
+    if (OFFLINE) {
+      this.setState({ isLoading: false });
+      return;
+    }
+
     var headers = new Headers();
     headers.append('Accept-Encoding', 'gzip');
     headers.append('Authorization', 'Basic ' + base64.encode(API_USER + ":" + API_PASSWORD));
@@ -27,14 +32,14 @@ export default class ArtistasScreen extends Component {
         .then((responseJson) => {
 	    this.setState({
 	        isLoading: false,
-		artistas: responseJson,
+		      artistas: responseJson,
 	    }, function(){});
     })
     .catch((error) => {
-	console.error(error);
+      console.error(error);
     });
   }
-      
+
   irACanciones(idArtista) {
     return this.props.navigation.navigate('Canciones', { idArtista: idArtista });
   }
@@ -49,6 +54,7 @@ export default class ArtistasScreen extends Component {
     }
 
 	return (
+      <View style={styles.container}>
         <FlatList
           data={this.state.artistas}
           renderItem={({item}) =>
@@ -57,6 +63,7 @@ export default class ArtistasScreen extends Component {
               </TouchableHighlight>
             }
         />
+      </View>
     );
   }
 }
@@ -64,7 +71,7 @@ export default class ArtistasScreen extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+		backgroundColor: '#f8f9fa',
     alignItems: 'center',
     justifyContent: 'center',
   },

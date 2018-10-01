@@ -2,9 +2,13 @@ import React, { Component } from 'react';
 import { StyleSheet, ScrollView, Text, Alert, View, ActivityIndicator } from 'react-native';
 import ParsedText from 'react-native-parsed-text';
 import base64 from 'react-native-base64'
-import { API_URL, API_USER, API_PASSWORD } from './Config.js';
+import { API_URL, API_USER, API_PASSWORD, OFFLINE } from './Config.js';
 
 export default class Cancion extends Component {
+
+	static navigtionOptions = {
+		title: 'Beatles',
+  };
 
 	constructor(props) {
 		super(props);
@@ -29,7 +33,11 @@ export default class Cancion extends Component {
 		}
 	}
 
-	componentDidMount(){
+	componentDidMount() {
+		if (OFFLINE) {
+      this.setState({ isLoading: false });
+			return;
+		}
 
 		var headers = new Headers();
 		headers.append('Accept-Encoding', 'gzip');
@@ -57,7 +65,7 @@ export default class Cancion extends Component {
 	}
 
 	renderAcorde(matchingString, matches) {
-		return matches[0].slice(1, -1);
+		return '  ' + matches[0].slice(1, -1) + '  ';
 	}
 
 	renderP(matchingString, matches) {
@@ -77,9 +85,10 @@ export default class Cancion extends Component {
 			<ScrollView style={styles.container}>
 				<Text style={styles.titulo}>{this.state.cancion.title}</Text>
 				<ParsedText
+					style={styles.texto}
 					parse={
 						[
-							{pattern: /\|[a-zA-Z0-9#]*\|/, style: styles.acorde, renderText: this.renderAcorde, onPress: this.onAcordePressed },
+							{pattern: /\|[a-zA-Z0-9#/]*\|/, style: styles.acorde, renderText: this.renderAcorde, onPress: this.onAcordePressed },
 							{pattern: /p\(+./, renderText: this.renderP }
 						]
 					}
@@ -92,13 +101,23 @@ export default class Cancion extends Component {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: '#fff'
+		backgroundColor: '#f8f9fa'
 	},
   titulo: {
-	  fontSize: 28
+		fontFamily: 'sans-serif',
+	  fontSize: 28,
+		lineHeight: 80,
+		color: '#f06200',
   },
+	texto: {
+		fontFamily: 'serif',
+		fontSize: 18,
+		lineHeight: 34,
+		color: '#000000'
+	},
   acorde: {
+		fontWeight: 'bold',
 	  backgroundColor: '#ffd1b3',
-  	  color: '#000000',
+  	color: '#000000',
   }
 });
