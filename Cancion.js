@@ -1,13 +1,30 @@
 import React, { Component } from 'react';
-import { StyleSheet, ScrollView, Text, Alert, View, ActivityIndicator } from 'react-native';
+import { StyleSheet, ScrollView, Text, Alert, View, ActivityIndicator, Image } from 'react-native';
 import ParsedText from 'react-native-parsed-text';
 import base64 from 'react-native-base64'
 import { API_URL, API_USER, API_PASSWORD, OFFLINE } from './Config.js';
 
+class CancionTitle extends React.Component {
+  render() {
+    return (
+			<View style={{ flexDirection: 'row'}}>
+	      <Image
+	        source={require('./img/font_dec.png')}
+	        style={{ width: 30, height: 30 }}
+	      />
+				<Image
+					source={require('./img/font_inc.png')}
+					style={{ width: 30, height: 30 }}
+				/>
+			</View>
+    );
+  }
+}
+
 export default class Cancion extends Component {
 
-	static navigtionOptions = {
-		title: 'Beatles',
+	static navigationOptions = {
+		headerTitle: <CancionTitle />,
   };
 
 	constructor(props) {

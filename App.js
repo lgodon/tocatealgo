@@ -20,8 +20,8 @@ export default class App extends Component {
 
 const RootStack = createStackNavigator(
   {
-    Cancion: Cancion,
     Artistas: ArtistasScreen,
     Canciones: CancionesScreen,
+    Cancion: Cancion,
   }
 );
