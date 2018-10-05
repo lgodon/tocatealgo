@@ -11,6 +11,7 @@
     "react": "16.5.0",
     "react-native": "0.57.1",
     "react-native-base64": "0.0.1",
+    "react-native-material-cards": "^1.0.9",
     "react-native-parsed-text": "0.0.20",
     "react-navigation": "^2.16.0"
   },

@@ -7,12 +7,12 @@ import { API_URL, API_USER, API_PASSWORD, OFFLINE } from './Config.js';
 class CancionTitle extends React.Component {
   render() {
     return (
-			<Text>Header</Text>
+			<Text></Text>
     );
   }
 }
 
-export default class Cancion extends Component {
+export default class CancionScreen extends Component {
 
 	static navigationOptions = ({ navigation }) => {
 		return {
@@ -20,15 +20,21 @@ export default class Cancion extends Component {
 			headerRight: (
 				<View style={{ flexDirection: 'row'}}>
 					<TouchableHighlight onPress={navigation.getParam('playPauseScroll')}>
+						<Image
+							source={require('./img/playpause.png')}
+							style={{ width: 30, height: 30, marginRight:30 }}
+						/>
+					</TouchableHighlight>
+					<TouchableHighlight onPress={navigation.getParam('achicarLetra')}>
 			      <Image
 			        source={require('./img/font_dec.png')}
-			        style={{ width: 30, height: 30 }}
+			        style={{ width: 30, height: 30, marginRight:10 }}
 			      />
 					</TouchableHighlight>
 					<TouchableHighlight onPress={navigation.getParam('agrandarLetra')}>
 						<Image
 							source={require('./img/font_inc.png')}
-							style={{ width: 30, height: 30 }}
+							style={{ width: 30, height: 30, marginRight:20 }}
 						/>
 					</TouchableHighlight>
 				</View>
@@ -67,7 +73,7 @@ export default class Cancion extends Component {
 	}
 
 	componentDidMount() {
-		//this.props.navigation.setParams({ achicarLetra: this._achicarLetra.bind(this) })
+		this.props.navigation.setParams({ achicarLetra: this._achicarLetra.bind(this) })
 		this.props.navigation.setParams({ agrandarLetra: this._agrandarLetra.bind(this) })
 		this.props.navigation.setParams({ playPauseScroll: this._playPauseScroll.bind(this) })
 
@@ -116,16 +122,16 @@ export default class Cancion extends Component {
 				position = this.state.currentScrollerPosition + 3;
 				this.scroller.current.scrollTo({ y: position, animated: false });
 				this.setState({ currentScrollerPosition: position });
-			}	, 20);
+			}	, 100);
 		} else {
 			clearInterval(this.activeInterval);
 		}
 	}
 
 	autoScroll() {
-		position = this.state.currentPosition + 5;
-		this.scroller.current.scrollTo({ y: this.state.currentScrollerPosition + 10, animated: true });
-    this.setState({ currentPosition: position });
+		position = this.state.currentScrollerPosition + 1;
+		this.scroller.current.scrollTo({ y: position, animated: true });
+    this.setState({ currentScrollerPosition: position });
 	}
 
 	onAcordePressed(acorde) {
@@ -185,6 +191,8 @@ const styles = StyleSheet.create({
 	  fontSize: 28,
 		lineHeight: 42,
 		color: '#f06200',
+		marginTop: 20,
+		marginBottom: 30,
   },
 	textoColor: {
 		fontFamily: 'serif',

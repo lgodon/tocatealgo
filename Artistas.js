@@ -5,6 +5,10 @@ import { API_URL, API_USER, API_PASSWORD, OFFLINE } from './Config.js';
 
 export default class ArtistasScreen extends Component {
 
+  static navigationOptions = {
+    headerTitle: 'the sacados',
+  };
+
   constructor(props) {
     super(props);
 
