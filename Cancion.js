@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, ScrollView, Text, Alert, View, ActivityIndicator, Image } from 'react-native';
+import { StyleSheet, ScrollView, Text, Alert, View, ActivityIndicator, Image, Button, TouchableHighlight } from 'react-native';
 import ParsedText from 'react-native-parsed-text';
 import base64 from 'react-native-base64'
 import { API_URL, API_USER, API_PASSWORD, OFFLINE } from './Config.js';
@@ -7,31 +7,47 @@ import { API_URL, API_USER, API_PASSWORD, OFFLINE } from './Config.js';
 class CancionTitle extends React.Component {
   render() {
     return (
-			<View style={{ flexDirection: 'row'}}>
-	      <Image
-	        source={require('./img/font_dec.png')}
-	        style={{ width: 30, height: 30 }}
-	      />
-				<Image
-					source={require('./img/font_inc.png')}
-					style={{ width: 30, height: 30 }}
-				/>
-			</View>
+			<Text>Header</Text>
     );
   }
 }
 
 export default class Cancion extends Component {
 
-	static navigationOptions = {
-		headerTitle: <CancionTitle />,
+	static navigationOptions = ({ navigation }) => {
+		return {
+			headerTitle: <CancionTitle />,
+			headerRight: (
+				<View style={{ flexDirection: 'row'}}>
+					<TouchableHighlight onPress={navigation.getParam('playPauseScroll')}>
+			      <Image
+			        source={require('./img/font_dec.png')}
+			        style={{ width: 30, height: 30 }}
+			      />
+					</TouchableHighlight>
+					<TouchableHighlight onPress={navigation.getParam('agrandarLetra')}>
+						<Image
+							source={require('./img/font_inc.png')}
+							style={{ width: 30, height: 30 }}
+						/>
+					</TouchableHighlight>
+				</View>
+			)
+		}
   };
 
 	constructor(props) {
 		super(props);
 
+		this.autoScroll = this.autoScroll.bind(this);
+
+		this.scroller = React.createRef();
+
 		this.state = {
+			letraSize: 16,
 			isLoading: true,
+			isScrolling: false,
+			currentScrollerPosition: 0,
 			cancion:
 			{
 			   "id":315,
@@ -51,6 +67,10 @@ export default class Cancion extends Component {
 	}
 
 	componentDidMount() {
+		//this.props.navigation.setParams({ achicarLetra: this._achicarLetra.bind(this) })
+		this.props.navigation.setParams({ agrandarLetra: this._agrandarLetra.bind(this) })
+		this.props.navigation.setParams({ playPauseScroll: this._playPauseScroll.bind(this) })
+
 		if (OFFLINE) {
       this.setState({ isLoading: false });
 			return;
@@ -77,6 +97,37 @@ export default class Cancion extends Component {
       });
   }
 
+	componentWillUnmount() {
+		clearInterval(this.activeInterval);
+	}
+
+	_agrandarLetra() {
+		this.setState({ letraSize: this.state.letraSize + 1 });
+	}
+
+	_achicarLetra() {
+		this.setState({ letraSize: this.state.letraSize - 1 });
+	}
+
+	_playPauseScroll() {
+		this.setState({ isScrolling: !this.state.isScrolling });
+		if (this.state.isScrolling) {
+			this.activeInterval = setInterval(() => {
+				position = this.state.currentScrollerPosition + 3;
+				this.scroller.current.scrollTo({ y: position, animated: false });
+				this.setState({ currentScrollerPosition: position });
+			}	, 20);
+		} else {
+			clearInterval(this.activeInterval);
+		}
+	}
+
+	autoScroll() {
+		position = this.state.currentPosition + 5;
+		this.scroller.current.scrollTo({ y: this.state.currentScrollerPosition + 10, animated: true });
+    this.setState({ currentPosition: position });
+	}
+
 	onAcordePressed(acorde) {
 		Alert.alert('Acá va el dibujo del acorde: ' + acorde.slice(1, -1));
 	}
@@ -89,6 +140,13 @@ export default class Cancion extends Component {
 		return '     ';
 	}
 
+	textStyle() {
+		return {
+			fontSize: this.state.letraSize,
+			lineHeight: 24,
+		}
+	}
+
 	render() {
 		if(this.state.isLoading){
       return(
@@ -99,10 +157,12 @@ export default class Cancion extends Component {
     }
 
 		return (
-			<ScrollView style={styles.container}>
+			<View style={{ flex: 1, backgroundColor: '#f8f9fa' }}>
+			<ScrollView style={styles.container}
+				ref={this.scroller} >
 				<Text style={styles.titulo}>{this.state.cancion.title}</Text>
 				<ParsedText
-					style={styles.texto}
+					style={styles.textoColor, this.textStyle()}
 					parse={
 						[
 							{pattern: /\|[a-zA-Z0-9#/]*\|/, style: styles.acorde, renderText: this.renderAcorde, onPress: this.onAcordePressed },
@@ -111,25 +171,23 @@ export default class Cancion extends Component {
 					}
 					>{this.state.cancion.body}</ParsedText>
 			</ScrollView>
+			</View>
 		);
 	}
 }
 
 const styles = StyleSheet.create({
 	container: {
-		flex: 1,
-		backgroundColor: '#f8f9fa'
+		marginLeft: 15,
 	},
   titulo: {
 		fontFamily: 'sans-serif',
 	  fontSize: 28,
-		lineHeight: 80,
+		lineHeight: 42,
 		color: '#f06200',
   },
-	texto: {
+	textoColor: {
 		fontFamily: 'serif',
-		fontSize: 18,
-		lineHeight: 34,
 		color: '#000000'
 	},
   acorde: {
